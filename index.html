@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape the Virus: W7-21 Mission</title>
+<style>
+body {
+  font-family: 'Courier New', monospace;
+  background: black;
+  color: #00ff00;
+  text-align: center;
+  margin: 0;
+  overflow: hidden;
+}
+.screen { display: none; padding: 20px; }
+.active { display: block; }
+button {
+  font-family: monospace;
+  background: black;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  padding: 10px 20px;
+  margin: 10px;
+  cursor: pointer;
+}
+button:hover { background: #00ff00; color: black; }
+
+#hud {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  border-top: 2px solid #00ff00;
+  padding: 10px 0;
+}
+.bar { width: 200px; height: 20px; border: 1px solid #00ff00; position: relative; }
+.bar-fill { background: #00ff00; height: 100%; width: 100%; }
+
+</style>
+</head>
+<body>
+
+<!-- Planet Selection -->
+<div id="planetSelect" class="screen active">
+  <h1>Earth is infected by a virus!</h1>
+  <p>Select your escape planet:</p>
+  <button onclick="choosePlanet('W7-21')">W7-21</button>
+</div>
+
+<!-- Planet Details -->
+<div id="planetDetails" class="screen">
+  <h1 id="planetName"></h1>
+  <p id="planetInfo"></p>
+  <button onclick="launchSpaceship()">Launch Spaceship</button>
+</div>
+
+<!-- Spaceship Travel -->
+<div id="spaceship" class="screen">
+  <h1>Spaceship in flight...</h1>
+  <p id="travelInfo"></p>
+</div>
+
+<!-- Planet Surface -->
+<div id="planetSurface" class="screen">
+  <h1>Arrived on <span id="arrivalPlanet"></span>!</h1>
+  <p>Click the star to scan stellar properties.</p>
+  <button onclick="showStellarProperties()">Scan Star</button>
+  <button onclick="showRadiationTemp()">Check Helmet Details</button>
+  <div id="stellarInfo"></div>
+  <div id="helmetInfo"></div>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div>Health: <div class="bar"><div class="bar-fill" id="healthBar"></div></div></div>
+  <div>Hunger: <div class="bar"><div class="bar-fill" id="hungerBar"></div></div></div>
+</div>
+
+<script>
+// Planetary Data
+const planetData = {
+  "W7-21": {
+    planetaryProps: `
+      Radius: 10,551,690.55 m<br>
+      Mass: 2.568 x 10^25 kg<br>
+      Gravity: 15.38 m/s²
+    `,
+    orbitalProps: `
+      Orbit Period: 17.8 days<br>
+      Orbit Radius: 1.26 x 10^10 m (0.0842 AU)
+    `,
+    stellarProps: `
+      Star Class: M3<br>
+      Mass: 5.0 x 10^29 kg<br>
+      Radius: 1.8 x 10^8 m<br>
+      Luminosity: 1.76 x 10^25 W<br>
+      Temperature: 3500 K<br>
+      Color: Red-Orange
+    `,
+    radiationTemp: `
+      Radiation: 8500 W/m²<br>
+      Surface Temp: ??? K (??°C)
+    `,
+    distance: "1.32 x 10^17 m (13.99 ly)<br>Travel Time: 378,000 years at 39,897 km/h"
+  }
+};
+
+let selectedPlanet = "";
+
+function choosePlanet(name) {
+  selectedPlanet = name;
+  document.getElementById("planetName").innerText = name;
+  document.getElementById("planetInfo").innerHTML = planetData[name].planetaryProps;
+  showScreen("planetDetails");
+}
+
+function launchSpaceship() {
+  showScreen("spaceship");
+  document.getElementById("travelInfo").innerHTML = planetData[selectedPlanet].distance;
+  setTimeout(() => {
+    document.getElementById("arrivalPlanet").innerText = selectedPlanet;
+    showScreen("planetSurface");
+    document.getElementById("stellarInfo").innerHTML = "";
+    document.getElementById("helmetInfo").innerHTML = "";
+  }, 3000); // simulate travel
+}
+
+function showStellarProperties() {
+  document.getElementById("stellarInfo").innerHTML = planetData[selectedPlanet].stellarProps;
+}
+
+function showRadiationTemp() {
+  document.getElementById("helmetInfo").innerHTML = planetData[selectedPlanet].radiationTemp;
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+// HUD Example
+let health = 100;
+let hunger = 100;
+function updateHUD() {
+  document.getElementById("healthBar").style.width = health + "%";
+  document.getElementById("hungerBar").style.width = hunger + "%";
+}
+setInterval(() => { 
+  hunger = Math.max(0, hunger - 0.05);
+  updateHUD();
+}, 100);
+</script>
+
+</body>
+</html>
